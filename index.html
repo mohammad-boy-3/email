@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="صفحهٔ آموزشی تعاملی دربارهٔ ایمیل، پروتکل‌های SMTP، POP3 و IMAP، اجزای پیام و نکات امنیتی — ویژهٔ دانش‌آموزان پایهٔ نهم.">
+<title>📧 درس تعاملی ایمیل (E-mail) — پایهٔ نهم</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A7%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============ پایه ============ */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  --bg:#f6f8fd; --card:#fff; --ink:#1e293b; --muted:#64748b;
+  --primary:#6366f1; --primary-dark:#4338ca; --cyan:#06b6d4; --amber:#f59e0b;
+  --radius:1.25rem; --shadow:0 10px 30px -12px rgba(30,41,59,.14);
+}
+body{font-family:'Vazirmatn',Tahoma,'Segoe UI',sans-serif;background:var(--bg);color:var(--ink);line-height:2;overflow-x:hidden}
+::selection{background:#c7d2fe}
+img,svg{max-width:100%}
+.container{max-width:1100px;margin-inline:auto;padding-inline:1.2rem}
+section{padding:3.8rem 0}
+section[id],header[id]{scroll-margin-top:80px}
+.en{direction:ltr;unicode-bidi:isolate}
+a{text-decoration:none}
+button{font-family:inherit}
+
+/* دکمه‌ها */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:none;cursor:pointer;font-weight:800;font-size:1rem;padding:.85rem 1.7rem;border-radius:99px;transition:transform .25s,box-shadow .25s,background .25s}
+.btn-sm{padding:.55rem 1.2rem;font-size:.9rem}
+.btn-grad{background:linear-gradient(135deg,#6366f1,#4f46e5 55%,#0e7490);color:#fff;box-shadow:0 12px 26px -10px rgba(79,70,229,.55)}
+.btn-grad:hover{transform:translateY(-3px);box-shadow:0 18px 34px -12px rgba(79,70,229,.6)}
+.btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1.5px solid rgba(255,255,255,.4)}
+.btn-ghost:hover{background:rgba(255,255,255,.24);transform:translateY(-3px)}
+.btn-light{background:#fff;color:var(--primary-dark);border:1.5px solid #e0e7ff}
+.btn-light:hover{border-color:#c7d2fe;transform:translateY(-2px);box-shadow:0 10px 22px -12px rgba(30,41,59,.25)}
+
+/* انیمیشن‌های عمومی */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease;transition-delay:var(--d,0s)}
+.reveal.visible{opacity:1;transform:none}
+.reveal-fade{opacity:0;transition:opacity .7s ease}
+.reveal-fade.visible{opacity:1}
+.swap{animation:fadeSlide .5s ease}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+/* نوار بالا */
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid #e2e8f0}
+.nav-in{max-width:1100px;margin:auto;padding:.55rem 1.2rem;display:flex;align-items:center;gap:1rem}
+.brand{font-weight:900;font-size:1.02rem;display:flex;align-items:center;gap:.5rem;color:var(--primary-dark);white-space:nowrap}
+.nav-links{display:flex;gap:.25rem;overflow-x:auto;scrollbar-width:none;flex:1}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:#334155;font-weight:700;font-size:.88rem;padding:.45rem .85rem;border-radius:99px;white-space:nowrap;transition:.25s}
+.nav-links a:hover{background:#eef2ff;color:var(--primary-dark)}
+.nav-links a.nav-cta{background:linear-gradient(135deg,#6366f1,#06b6d4);color:#fff}
+@media(max-width:640px){.brand .t{display:none}}
+
+/* قهرمان صفحه */
+.hero{position:relative;background:linear-gradient(140deg,#1e1b4b 0%,#312e81 45%,#0e7490 100%);color:#fff;padding:4.2rem 0 5rem;overflow:hidden}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
+.b1{width:340px;height:340px;background:#6366f1;opacity:.5;top:-90px;left:-60px}
+.b2{width:300px;height:300px;background:#06b6d4;opacity:.35;bottom:-70px;right:-50px}
+.hero-in{position:relative;z-index:2;text-align:center;max-width:860px;margin:auto;padding-inline:1.2rem}
+.hero-badge{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:.42rem 1.1rem;border-radius:99px;font-size:.88rem;font-weight:700;margin-bottom:1.5rem}
+.big-mail{width:96px;margin:0 auto 1.4rem;animation:bob 3.2s ease-in-out infinite;filter:drop-shadow(0 16px 26px rgba(0,0,0,.4))}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-13px)}}
+.hero h1{font-size:clamp(1.85rem,5vw,3.1rem);font-weight:900;line-height:1.55;margin-bottom:1.1rem}
+.hero h1 .grad{background:linear-gradient(90deg,#a5b4fc,#67e8f9);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lead{font-size:clamp(.98rem,2.4vw,1.17rem);color:#c7d2fe;max-width:680px;margin:0 auto 2rem}
+.hero-cta{display:flex;gap:.9rem;justify-content:center;flex-wrap:wrap}
+.float-ico{position:absolute;font-size:1.6rem;opacity:.5;animation:floaty 7s ease-in-out infinite;pointer-events:none;z-index:1}
+.fi1{top:15%;right:7%}
+.fi2{top:28%;left:9%;font-size:1.9rem;animation-delay:-1.4s}
+.fi3{bottom:26%;right:15%;font-size:1.4rem;animation-delay:-2.8s}
+.fi4{bottom:34%;left:17%;animation-delay:-4.2s}
+.fi5{top:10%;left:36%;font-size:1.3rem;animation-delay:-5.6s}
+@keyframes floaty{0%,100%{transform:translateY(0) rotate(-7deg)}50%{transform:translateY(-18px) rotate(7deg)}}
+@media(max-width:640px){.float-ico{display:none}}
+
+/* آمار */
+.stats{position:relative;z-index:2;max-width:920px;margin:3rem auto 0;padding:0 1.2rem;display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.stat{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);border-radius:1.1rem;padding:1.15rem 1rem;text-align:center}
+.stat .num{font-size:1.6rem;font-weight:900;color:#fff;line-height:1.6}
+.stat .lbl{font-size:.84rem;color:#c7d2fe;margin-top:.15rem}
+@media(max-width:640px){.stats{grid-template-columns:1fr;gap:.7rem;margin-top:2.2rem}}
+
+/* سرصفحهٔ بخش‌ها */
+.sec-head{text-align:center;max-width:680px;margin:0 auto 2.7rem}
+.sec-ico{width:66px;height:66px;border-radius:1.2rem;display:grid;place-items:center;font-size:1.9rem;margin:0 auto 1rem;background:linear-gradient(135deg,#eef2ff,#cffafe);box-shadow:inset 0 0 0 1px #e0e7ff,0 12px 26px -14px rgba(79,70,229,.4)}
+.sec-head h2{font-size:clamp(1.45rem,4vw,2.05rem);font-weight:900;background:linear-gradient(90deg,#4f46e5,#0891b2);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:.45rem;line-height:1.6}
+.sec-sub{color:var(--muted);font-size:.98rem}
+
+/* بخش تعریف */
+.def-grid{display:grid;grid-template-columns:1.25fr .9fr;gap:1.4rem;align-items:stretch}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid #eef2f7;padding:1.8rem}
+.def-text p{color:#334155}
+.addr2{background:#eef2ff;color:var(--primary-dark);padding:.08rem .55rem;border-radius:.5rem;font-size:.88em;font-weight:700;direction:ltr;unicode-bidi:isolate}
+.feature-chips{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:1.2rem}
+.f-chip{background:#eef2ff;color:#4338ca;border:1px solid #e0e7ff;padding:.35rem .9rem;border-radius:99px;font-size:.85rem;font-weight:700}
+.didyou{background:linear-gradient(150deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:var(--radius);padding:1.7rem;display:flex;flex-direction:column;justify-content:center;gap:.6rem}
+.didyou h3{color:#b45309;font-size:1.06rem;font-weight:900}
+.didyou p{color:#78350f;font-size:.95rem}
+.mini-flow{display:flex;align-items:center;justify-content:center;gap:.7rem;margin-top:.9rem;flex-wrap:wrap}
+.mf-box{background:#fff;border:1.5px dashed #fcd34d;border-radius:1rem;padding:.6rem 1rem;font-weight:800;font-size:.9rem;display:flex;flex-direction:column;align-items:center;gap:.1rem;line-height:1.7}
+.mf-box span{font-size:1.5rem}
+.mf-box.hl{border-color:#6366f1;background:#eef2ff}
+.mf-box small{font-weight:600;color:#94a3b8;font-size:.72rem}
+.mf-arrow{color:#f59e0b;font-size:1.5rem;font-weight:900}
+@media(max-width:820px){.def-grid{grid-template-columns:1fr}}
+/* رنگ زمینهٔ بخش‌ها */
+.tint-indigo{background:linear-gradient(180deg,#eef2ff,var(--bg))}
+.tint-cyan{background:linear-gradient(180deg,#ecfeff,var(--bg))}
+.tint-rose{background:linear-gradient(180deg,#fff1f2,var(--bg))}
+
+/* سفر ایمیل */
+.journey-card{background:#fff;border-radius:1.5rem;box-shadow:var(--shadow);border:1px solid #eef2f7;padding:2rem 1.4rem 1.6rem}
+.journey-track{position:relative;display:flex;padding-top:4px}
+.station{flex:1;display:flex;flex-direction:column;align-items:center;gap:.6rem;cursor:pointer;position:relative;z-index:2;min-width:0;padding:0 .2rem}
+.st-circle{width:58px;height:58px;border-radius:50%;background:#fff;border:3px solid #dbe3f0;display:grid;place-items:center;font-size:1.55rem;transition:transform .35s,box-shadow .35s,border-color .35s,background .35s}
+.station:hover .st-circle{transform:translateY(-4px)}
+.station.active .st-circle{background:linear-gradient(135deg,#6366f1,#06b6d4);border-color:transparent;transform:scale(1.14);box-shadow:0 12px 26px -10px rgba(79,70,229,.55)}
+.st-txt{display:flex;flex-direction:column;align-items:center;gap:.05rem}
+.st-stepnum{font-size:.68rem;color:#94a3b8;font-weight:800}
+.st-name{font-size:.82rem;font-weight:800;color:#475569;text-align:center;line-height:1.6}
+.station.active .st-name{color:var(--primary-dark)}
+.track-line{position:absolute;top:30.5px;right:calc(100%/12);left:calc(100%/12);height:5px;background:#e2e8f0;border-radius:99px;z-index:0}
+.track-fill{position:absolute;top:0;right:0;height:100%;width:0;background:linear-gradient(270deg,#6366f1,#06b6d4);border-radius:99px;transition:width .6s ease,height .6s ease}
+.f-env{position:absolute;top:0;left:0;width:48px;height:48px;z-index:6;transition:transform .85s cubic-bezier(.45,1.45,.55,1);pointer-events:none;filter:drop-shadow(0 10px 16px rgba(67,56,202,.45))}
+.f-env .badge{width:48px;height:48px;border-radius:50%;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#6366f1,#06b6d4) border-box;border:3px solid transparent;display:grid;place-items:center;animation:bob2 1.8s ease-in-out infinite}
+@keyframes bob2{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
+.j-detail{margin-top:1.7rem;background:#f8fafc;border:1px solid #e2e8f0;border-radius:1.1rem;padding:1.5rem}
+.jd-title{display:flex;align-items:center;gap:.6rem;font-size:1.14rem;font-weight:900;color:var(--primary-dark);margin-bottom:.45rem}
+.jd-desc{color:#334155}
+.jd-tip{margin-top:.85rem;background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:.8rem;padding:.65rem 1rem;font-size:.92rem;font-weight:600}
+.j-controls{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:1.4rem;flex-wrap:wrap}
+.j-btns{display:flex;gap:.6rem;flex-wrap:wrap}
+.j-progress-txt{font-weight:900;color:#64748b;font-size:.95rem;white-space:nowrap}
+@media(max-width:760px){
+  .journey-track{flex-direction:column;align-items:stretch;gap:1.05rem;padding-top:0}
+  .station{flex-direction:row;align-items:center;gap:.85rem;text-align:right}
+  .st-circle{width:52px;height:52px;font-size:1.35rem;flex:0 0 52px}
+  .st-txt{align-items:flex-start}
+  .track-line{top:24px;bottom:24px;right:27.5px;left:auto;width:5px;height:auto}
+  .track-fill{width:100%;height:0}
+}
+
+/* پروتکل‌ها */
+.smtp-card{background:linear-gradient(135deg,#4f46e5,#6366f1 55%,#0891b2);color:#fff;border-radius:1.5rem;padding:1.8rem;box-shadow:0 22px 44px -18px rgba(79,70,229,.5);display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center}
+.smtp-ico{width:76px;height:76px;border-radius:1.3rem;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:2.3rem}
+.smtp-card h3{font-size:1.4rem;font-weight:900}
+.smtp-full{display:block;font-size:.72rem;font-weight:600;color:#c7d2fe;direction:ltr;unicode-bidi:isolate;margin-top:.2rem}
+.smtp-tag{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:99px;padding:.25rem 1rem;font-size:.85rem;font-weight:800;margin:.55rem 0 .8rem}
+.smtp-desc{color:#e0e7ff;font-size:.95rem}
+.ports-row{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
+.port-chip{display:flex;flex-direction:column;align-items:center;gap:.1rem;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);border-radius:.9rem;padding:.5rem .9rem;min-width:88px}
+.port-chip .pn{font-size:1.2rem;font-weight:900;direction:ltr;line-height:1.5}
+.port-chip .pl{font-size:.66rem;color:#c7d2fe;font-weight:700;text-align:center;line-height:1.6}
+.key-point{margin-top:1.2rem;background:linear-gradient(135deg,#eef2ff,#cffafe);border:1px solid #c7d2fe;border-radius:1.1rem;padding:1rem 1.3rem;font-size:.97rem;color:#3730a3;text-align:center;font-weight:600}
+@media(max-width:700px){.smtp-card{grid-template-columns:1fr;text-align:center}.smtp-ico{margin:auto}}
+
+/* کارت‌های چرخان POP3 و IMAP */
+.duo-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-top:1.4rem}
+.flip-card{perspective:1300px;cursor:pointer;min-height:440px;position:relative;border-radius:1.5rem;outline:none}
+.flip-inner{position:relative;width:100%;height:100%;min-height:440px;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,.15,.2,1)}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:1.5rem;padding:1.6rem;display:flex;flex-direction:column;align-items:center;text-align:center;justify-content:center}
+.front.pop3{background:linear-gradient(150deg,#f59e0b,#f97316);color:#fff;box-shadow:0 22px 44px -18px rgba(245,158,11,.55)}
+.front.imap{background:linear-gradient(150deg,#0891b2,#06b6d4);color:#fff;box-shadow:0 22px 44px -18px rgba(8,145,178,.55)}
+.fc-ico{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:2.7rem;margin-bottom:1rem}
+.face.front h3{font-size:1.6rem;font-weight:900}
+.fc-sub{font-size:.78rem;opacity:.9;direction:ltr;unicode-bidi:isolate;margin-top:.15rem}
+.fc-tag{font-size:1.3rem;font-weight:900;margin:.7rem 0 1.5rem}
+.fc-hint{background:rgba(255,255,255,.2);border:1px dashed rgba(255,255,255,.6);padding:.4rem 1.1rem;border-radius:99px;font-size:.78rem;font-weight:800;animation:pulse 2.2s infinite}
+.face.back{transform:rotateY(180deg);align-items:stretch;text-align:right;justify-content:flex-start;background:#fff;border:2px solid;overflow-y:auto}
+.face.back.b-pop3{border-color:#fcd34d}
+.face.back.b-imap{border-color:#a5f3fc}
+.face.back h4{font-weight:900;color:#1e293b;margin-bottom:.85rem;font-size:1.05rem}
+.face.back ul{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:.95rem}
+.face.back li{display:flex;gap:.5rem;color:#475569;font-size:.9rem;line-height:1.8}
+.face.back li::before{content:'✓';font-weight:900;color:#10b981;flex:none}
+.fc-tip{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:.8rem;padding:.65rem .95rem;font-size:.84rem;font-weight:600;margin-bottom:.95rem;line-height:1.9}
+.face.back .ports-row{margin-top:0}
+.face.back .port-chip{background:#f1f5f9;border:1px solid #e2e8f0}
+.face.back .port-chip .pn{color:#1e293b}
+.face.back .port-chip .pl{color:#64748b}
+.fit{margin-top:auto;background:#f1f5f9;border-radius:.8rem;padding:.55rem .9rem;font-size:.85rem;font-weight:800;color:#334155;text-align:center}
+@media(max-width:760px){.duo-grid{grid-template-columns:1fr}.flip-card,.flip-inner{min-height:540px}}
+
+/* جدول مقایسه */
+.tbl-wrap{overflow-x:auto;margin-top:1.4rem;border-radius:1.2rem;border:1px solid #e2e8f0;box-shadow:var(--shadow);background:#fff}
+table{width:100%;border-collapse:collapse;font-size:.93rem;min-width:560px}
+th{background:linear-gradient(135deg,#eef2ff,#cffafe);padding:.85rem 1rem;font-weight:900;color:#334155;white-space:nowrap}
+td{padding:.8rem 1rem;border-top:1px solid #eef2f7;text-align:center;color:#475569}
+th:first-child,td:first-child{text-align:right;font-weight:800;color:#1e293b}
+tbody tr:nth-child(even){background:#f8fafc}
+.note-line{margin-top:1.3rem;background:#f8fafc;border:1.5px dashed #cbd5e1;border-radius:1rem;padding:1rem 1.3rem;font-size:.93rem;color:#475569;line-height:2}
+
+/* اجزای پیام */
+.anat-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:1.4rem;align-items:start}
+.email-window{background:#fff;border-radius:1.3rem;box-shadow:var(--shadow);border:1px solid #e2e8f0;overflow:hidden}
+.ew-bar{background:#f1f5f9;padding:.65rem 1.1rem;display:flex;align-items:center;gap:.6rem;border-bottom:1px solid #e2e8f0;flex-wrap:wrap}
+.dots{display:flex;gap:.32rem}
+.dots i{width:11px;height:11px;border-radius:50%;display:block}
+.dots i:nth-child(1){background:#f87171}.dots i:nth-child(2){background:#fbbf24}.dots i:nth-child(3){background:#34d399}
+.ew-title{font-size:.8rem;color:#64748b;font-weight:700}
+.ew-hint{margin-inline-start:auto;background:#6366f1;color:#fff;font-size:.72rem;font-weight:800;padding:.3rem .85rem;border-radius:99px;box-shadow:0 8px 18px -8px rgba(79,70,229,.6);animation:pulse 2.2s infinite;white-space:nowrap}
+.ew-body{padding:1.4rem 1.4rem 1.6rem;display:flex;flex-direction:column;gap:.9rem}
+.email-part{position:relative;border-radius:.9rem;padding:.9rem 1rem;border:2px dashed transparent;transition:.3s;cursor:pointer;outline:none}
+.email-part:hover{border-color:#a5b4fc;background:#f5f7ff}
+.email-part.active{border-color:var(--primary);background:#eef2ff;box-shadow:0 0 0 4px #e0e7ff}
+.pnum{position:absolute;top:-12px;right:-9px;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#06b6d4);color:#fff;font-size:.78rem;font-weight:900;display:grid;place-items:center;box-shadow:0 5px 12px -4px rgba(79,70,229,.55)}
+.ep-row{display:flex;gap:.55rem;font-size:.94rem;padding:.12rem 0;flex-wrap:wrap;align-items:baseline}
+.ep-row .k{color:#64748b;font-weight:800;font-size:.82rem;min-width:104px}
+.addr{direction:ltr;unicode-bidi:isolate;color:#4f46e5;font-weight:700;font-size:.86rem;background:#eef2ff;padding:.05rem .5rem;border-radius:.45rem}
+.email-part p{margin:.14rem 0;color:#334155}
+.attach{display:inline-flex;align-items:center;gap:.6rem;background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;padding:.6rem 1.05rem;border-radius:.8rem;font-weight:800;font-size:.9rem}
+.attach small{font-weight:600;color:#94a3b8;font-size:.76rem}
+.sig{color:#64748b;font-size:.9rem;line-height:1.9}
+.info-panel{background:#fff;border-radius:1.3rem;box-shadow:var(--shadow);border:1px solid #e2e8f0;padding:1.6rem;position:sticky;top:86px;min-height:240px}
+.ip-default{text-align:center;color:#94a3b8;padding:1.4rem 0;font-weight:600}
+.ip-default .big{font-size:2.7rem;display:block;margin-bottom:.5rem}
+.ip-title{display:flex;gap:.6rem;align-items:center;font-weight:900;color:var(--primary-dark);font-size:1.08rem;margin-bottom:.6rem}
+.ip-desc{color:#334155;font-size:.95rem}
+.ip-chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem}
+.ip-chip{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:.7rem;padding:.3rem .7rem;font-size:.78rem;font-weight:700;color:#475569}
+@media(max-width:900px){.anat-grid{grid-template-columns:1fr}.info-panel{position:static}}
+
+/* کاربردها / مزایا / معایب */
+.life-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.life-card{background:#fff;border-radius:1.3rem;box-shadow:var(--shadow);border:1px solid #eef2f7;padding:1.6rem;border-top:4px solid}
+.c-uses{border-top-color:#6366f1}
+.c-pros{border-top-color:#10b981}
+.c-cons{border-top-color:#f59e0b}
+.life-card h3{display:flex;align-items:center;gap:.5rem;font-weight:900;margin-bottom:1rem;font-size:1.03rem;color:#1e293b;flex-wrap:wrap}
+.life-card ul{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.life-card li{display:flex;gap:.55rem;align-items:flex-start;color:#475569;font-size:.9rem;line-height:1.8}
+.life-card li .ic{flex:none}
+@media(max-width:860px){.life-grid{grid-template-columns:1fr}}
+
+/* امنیت */
+.sec-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.sec-card{background:#fff;border-radius:1.3rem;box-shadow:var(--shadow);border:1px solid #eef2f7;padding:1.6rem;transition:transform .3s,box-shadow .3s}
+.sec-card:hover{transform:translateY(-6px);box-shadow:0 20px 38px -16px rgba(15,23,42,.18)}
+.sec-card .ic{width:54px;height:54px;border-radius:1rem;display:grid;place-items:center;font-size:1.6rem;margin-bottom:1rem}
+.sec-card h3{font-size:1rem;font-weight:900;margin-bottom:.5rem;color:#1e293b}
+.sec-card p{color:#475569;font-size:.89rem;line-height:2}
+.sec-note{margin-top:1.5rem;background:#fff;border:2px dashed #fecaca;border-radius:1.2rem;padding:1.1rem 1.4rem;color:#475569;text-align:center;font-size:.96rem}
+@media(max-width:1000px){.sec-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.sec-grid{grid-template-columns:1fr}}
+
+/* آزمون */
+.quiz-card{max-width:700px;margin:0 auto;background:#fff;border-radius:1.5rem;box-shadow:var(--shadow);border:1px solid #eef2f7;padding:1.9rem}
+.q-progress{height:9px;background:#eef2f7;border-radius:99px;overflow:hidden;margin-bottom:.6rem}
+.q-bar{height:100%;width:0;background:linear-gradient(270deg,#6366f1,#06b6d4);border-radius:99px;transition:width .5s}
+.q-meta{display:flex;justify-content:space-between;font-size:.8rem;color:#94a3b8;font-weight:800;margin-bottom:1rem}
+.q-text{font-size:1.1rem;font-weight:900;color:#1e293b;margin-bottom:1.3rem;line-height:2}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.q-opt{background:#f8fafc;border:2px solid #e2e8f0;border-radius:.9rem;padding:.8rem 1rem;font-size:.95rem;font-weight:800;color:#334155;cursor:pointer;transition:.25s;text-align:center}
+.q-opt:hover:not(:disabled){border-color:#a5b4fc;background:#eef2ff;transform:translateY(-2px)}
+.q-opt.correct{border-color:#10b981;background:#ecfdf5;color:#065f46}
+.q-opt.wrong{border-color:#f87171;background:#fef2f2;color:#991b1b}
+.q-opt:disabled{cursor:default}
+.q-feedback{margin-top:1.1rem;border-radius:1rem;padding:1rem 1.15rem;font-size:.9rem;display:none;line-height:2}
+.q-feedback.ok{display:block;background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}
+.q-feedback.no{display:block;background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.q-next{display:none;margin-top:1.2rem}
+.q-result{text-align:center;padding:.6rem 0;animation:fadeSlide .5s ease}
+.score-ring{width:132px;height:132px;border-radius:50%;margin:0 auto 1.1rem;display:grid;place-items:center;background:#eef2f7}
+.score-ring .in{width:106px;height:106px;background:#fff;border-radius:50%;display:grid;place-items:center;font-size:2.6rem}
+.q-result h3{font-size:1.4rem;font-weight:900;color:#1e293b;margin-bottom:.4rem}
+.q-msg{color:#475569;margin-bottom:1.4rem;font-size:.98rem}
+@media(max-width:560px){.q-opts{grid-template-columns:1fr}}
+
+/* پابرگ */
+footer{background:linear-gradient(140deg,#1e1b4b,#312e81);color:#c7d2fe;padding:3.2rem 0 2.6rem;text-align:center}
+.foot-ico{font-size:2.1rem;margin-bottom:.5rem}
+.foot-thanks{font-size:.98rem;max-width:680px;margin:0 auto 1.5rem;line-height:2.1}
+.credit{display:inline-block;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.24);padding:.95rem 2rem;border-radius:99px;color:#fff;font-weight:800;font-size:1.06rem;box-shadow:0 14px 30px -14px rgba(0,0,0,.5)}
+
+/* کاغذرنگی جشن */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden}
+.confetti i{position:absolute;top:-24px;width:10px;height:15px;border-radius:3px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(108vh) rotate(720deg)}}
+
+/* دسترس‌پذیری */
+a:focus-visible,button:focus-visible,.station:focus-visible,.email-part:focus-visible,.flip-card:focus-visible{outline:3px solid #a5b4fc;outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.reveal,.reveal-fade{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<noscript><div style="padding:1rem;text-align:center;color:#b91c1c;font-weight:700">برای استفاده از تعاملات این صفحه، لطفاً جاوااسکریپت را در مرورگر خود فعال کنید.</div></noscript>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a class="brand" href="#home">📧 <span class="t">درسِ ایمیل — پایهٔ نهم</span></a>
+    <div class="nav-links">
+      <a href="#definition">ایمیل چیست؟</a>
+      <a href="#journey">سفرِ ایمیل</a>
+      <a href="#protocols">پروتکل‌ها</a>
+      <a href="#anatomy">اجزای پیام</a>
+      <a href="#security">امنیت</a>
+      <a href="#quiz" class="nav-cta">🧠 آزمون</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="home">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <span class="float-ico fi1">✉️</span>
+  <span class="float-ico fi2">📨</span>
+  <span class="float-ico fi3">🌐</span>
+  <span class="float-ico fi4">🔒</span>
+  <span class="float-ico fi5">@</span>
+  <div class="hero-in">
+    <div class="hero-badge">💻 درسِ رایانه • پایهٔ نهم</div>
+    <svg class="big-mail" viewBox="0 0 96 96" fill="none" aria-hidden="true">
+      <rect x="8" y="20" width="80" height="58" rx="9" fill="#ffffff"/>
+      <rect x="8" y="20" width="80" height="58" rx="9" stroke="#4338ca" stroke-width="4"/>
+      <path d="M12 26 48 54 84 26" stroke="#6366f1" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="74" cy="64" r="13" fill="#f59e0b"/>
+      <path d="M68.5 64.5 73 69 80 60" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h1>ایمیل <span class="en">(E-mail)</span> چطور <span class="grad">کار می‌کند</span>؟</h1>
+    <p class="lead">ایمیل یعنی پست الکترونیکی (Electronic Mail): فرستادن و گرفتنِ پیام و فایل از طریق اینترنت — در چند ثانیه، به هر جای دنیا! در این صفحه با هم مسیرِ سفرِ یک ایمیل را دنبال می‌کنیم. 🚀</p>
+    <div class="hero-cta">
+      <a href="#journey" class="btn btn-grad">🚀 شروعِ سفرِ ایمیل</a>
+      <a href="#quiz" class="btn btn-ghost">🧠 آزمونِ خودت</a>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="num">📧 <span class="count" data-target="319.6">۰</span> میلیارد</div><div class="lbl">ایمیل در هر روز رد و بدل می‌شود (۲۰۲۴)</div></div>
+    <div class="stat"><div class="num">👥 <span class="count" data-target="4.48">۰</span> میلیارد</div><div class="lbl">کاربرِ ایمیل در سراسرِ جهان</div></div>
+    <div class="stat"><div class="num">⚠️ <span class="count" data-target="45.6">۰</span>٪</div><div class="lbl">از ایمیل‌ها اسپم (Spam) هستند</div></div>
+  </div>
+</header>
+
+<section id="definition">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">📬</div>
+      <h2>ایمیل <span class="en">(E-mail)</span> چیست؟</h2>
+      <p class="sec-sub">قبل از سفر، با مسافرِ ما کمی آشنا شو!</p>
+    </div>
+    <div class="def-grid">
+      <div class="card def-text reveal">
+        <p><b>ایمیل (E-mail)</b> یعنی <b>پست الکترونیکی (Electronic Mail)</b>؛ راهی برای فرستادن و گرفتنِ پیام‌ها، نوشته‌ها و فایل‌ها از طریقِ شبکه‌های کامپیوتری — مخصوصاً اینترنت. ایمیل یکی از <b>قدیمی‌ترین و پرکاربردترین</b> ابزارهای ارتباطیِ دنیای دیجیتال است و هنوز هم در کار، مدرسه و زندگیِ روزمره نقشِ مهمی دارد.</p>
+        <p style="margin-top:.7rem">هر نفر یک <b>آدرسِ ایمیل (Email Address)</b> یکتا دارد؛ مثلِ <span class="addr2">student@example.com</span> — علامتِ @ نامِ کاربر را از نامِ سرور جدا می‌کند.</p>
+        <div class="feature-chips">
+          <span class="f-chip">⚡ سریع — فقط چند ثانیه</span>
+          <span class="f-chip">💸 تقریباً رایگان</span>
+          <span class="f-chip">🌍 در تمامِ دنیا</span>
+          <span class="f-chip">📎 همراه با فایل</span>
+        </div>
+      </div>
+      <div class="didyou reveal" style="--d:.15s">
+        <h3>💡 آیا می‌دانستی؟</h3>
+        <p>اولین ایمیلِ بینِ دو کامپیوترِ متفاوت را <b>ری تاملینسون (Ray Tomlinson)</b> در سالِ ۱۹۷۱ فرستاد — و او همان کسی است که علامتِ <b>@</b> را برای ایمیل انتخاب کرد!</p>
+        <div class="mini-flow">
+          <div class="mf-box"><span>✉️</span>نامهٔ پستی<small>چند روز!</small></div>
+          <span class="mf-arrow">←</span>
+          <div class="mf-box"><span>🌐</span>اینترنت<small>با سرعتِ نور!</small></div>
+          <span class="mf-arrow">←</span>
+          <div class="mf-box hl"><span>📧</span>ایمیل<small>چند ثانیه!</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="journey" class="tint-indigo">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🚀</div>
+      <h2>سفرِ یک ایمیل <span class="en">(Email Journey)</span></h2>
+      <p class="sec-sub">از نوشته‌شدن تا رسیدن، ایمیل از ۶ ایستگاه عبور می‌کند — روی هر ایستگاه کلیک کن یا دکمهٔ «شروعِ سفر» را بزن! 🎬</p>
+    </div>
+    <div class="journey-card reveal-fade">
+      <div class="journey-track" id="jTrack">
+        <div class="track-line" id="trackLine"><div class="track-fill" id="trackFill"></div></div>
+        <div class="station" data-i="0" role="button" tabindex="0" aria-label="ایستگاه ۱: نوشتن ایمیل">
+          <div class="st-circle">✍️</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۱</span><span class="st-name">نوشتنِ ایمیل</span></div>
+        </div>
+        <div class="station" data-i="1" role="button" tabindex="0" aria-label="ایستگاه ۲: تحویل به سرور SMTP فرستنده">
+          <div class="st-circle">📤</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۲</span><span class="st-name">سرورِ SMTP فرستنده</span></div>
+        </div>
+        <div class="station" data-i="2" role="button" tabindex="0" aria-label="ایستگاه ۳: پرس و جو از DNS و رکورد MX">
+          <div class="st-circle">🔍</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۳</span><span class="st-name">پرس‌وجوی DNS</span></div>
+        </div>
+        <div class="station" data-i="3" role="button" tabindex="0" aria-label="ایستگاه ۴: انتقال بین دو سرور">
+          <div class="st-circle">📨</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۴</span><span class="st-name">انتقال بینِ سرورها</span></div>
+        </div>
+        <div class="station" data-i="4" role="button" tabindex="0" aria-label="ایستگاه ۵: رسیدن به صندوق پستی گیرنده">
+          <div class="st-circle">📥</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۵</span><span class="st-name">صندوقِ پستی <span class="en">(Mailbox)</span></span></div>
+        </div>
+        <div class="station" data-i="5" role="button" tabindex="0" aria-label="ایستگاه ۶: دریافت با POP3 یا IMAP">
+          <div class="st-circle">👀</div>
+          <div class="st-txt"><span class="st-stepnum">ایستگاه ۶</span><span class="st-name">دریافت با POP3 / IMAP</span></div>
+        </div>
+        <div class="f-env" id="envBadge" aria-hidden="true">
+          <div class="badge">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="3" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.8"/><path d="M3 7.5 12 13.5 21 7.5" stroke="#0891b2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="j-detail swap" id="jdPanel">
+        <h3 class="jd-title"><span id="jdIco"></span><span id="jdTitle"></span></h3>
+        <p class="jd-desc" id="jdDesc"></p>
+        <div class="jd-tip" id="jdTip"></div>
+      </div>
+      <div class="j-controls">
+        <div class="j-btns">
+          <button class="btn btn-light btn-sm" id="btnPrev">→ قبلی</button>
+          <button class="btn btn-grad btn-sm" id="btnPlay">▶ شروعِ سفر</button>
+          <button class="btn btn-light btn-sm" id="btnNext">بعدی ←</button>
+        </div>
+        <span class="j-progress-txt" id="jdStepTxt"></span>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="protocols">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🤝</div>
+      <h2>پروتکل‌های ایمیل <span class="en">(Protocols)</span></h2>
+      <p class="sec-sub">پروتکل یعنی قوانینِ مشترکِ گفتگو بین کامپیوترها — مثل آدابِ نامه‌نگاریِ رایانه‌ها!</p>
+    </div>
+    <div class="smtp-card reveal">
+      <div class="smtp-ico">📤</div>
+      <div>
+        <h3><span class="en">SMTP</span><small class="smtp-full">Simple Mail Transfer Protocol</small></h3>
+        <div class="smtp-tag">پستچیِ دنیای ایمیل — فقط «ارسال»!</div>
+        <p class="smtp-desc">وقتی دکمهٔ ارسال (Send) را می‌زنی، کلاینت یا وبمیل، ایمیل را با SMTP به سرورِ تو می‌دهد؛ سپس SMTP آن را از سرورِ فرستنده تا سرورِ گیرنده می‌رساند.</p>
+        <div class="ports-row">
+          <div class="port-chip"><span class="pn">25</span><span class="pl">سرور به سرور</span></div>
+          <div class="port-chip"><span class="pn">465</span><span class="pl">SSL/TLS</span></div>
+          <div class="port-chip"><span class="pn">587</span><span class="pl">STARTTLS — استانداردِ امروز</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="key-point reveal">🔑 <b>نکتهٔ کلیدی:</b> SMTP فقط <b>می‌فرستد</b>؛ POP3 و IMAP <b>دریافت می‌کنند</b> — این سه با هم کار می‌کنند و جای هم را نمی‌گیرند!</div>
+    <div class="duo-grid">
+      <div class="flip-card reveal" tabindex="0" role="button" aria-label="کارت مقایسه POP3 — برای چرخش کلیک کنید">
+        <div class="flip-inner">
+          <div class="face front pop3">
+            <div class="fc-ico">📥</div>
+            <h3><span class="en">POP3</span></h3>
+            <div class="fc-sub">Post Office Protocol v3</div>
+            <p class="fc-tag">«دانلود کن، با خودت ببر!»</p>
+            <span class="fc-hint">🔄 برای دیدنِ جزئیات کلیک کن</span>
+          </div>
+          <div class="face back b-pop3">
+            <h4>📥 POP3 چطور کار می‌کند؟</h4>
+            <ul>
+              <li>ایمیل‌ها روی دستگاهِ تو دانلود می‌شوند</li>
+              <li>معمولاً بعد از دانلود، از سرور <b>حذف</b> می‌شوند</li>
+              <li>بعد از دانلود، <b>بدونِ اینترنت</b> هم همه‌چیز داری (آفلاین)</li>
+              <li>پوشه‌ها و برچسب‌ها روی سرور ندارد</li>
+            </ul>
+            <div class="fc-tip">💡 مثل این است که نامه‌ها را از صندوقِ پستی برداری و به خانه ببری — دیگر در صندوق چیزی نیست!</div>
+            <div class="ports-row">
+              <div class="port-chip"><span class="pn">110</span><span class="pl">بدون رمزنگاری</span></div>
+              <div class="port-chip"><span class="pn">995</span><span class="pl">SSL/TLS — امن ✅</span></div>
+            </div>
+            <div class="fit">👤 مناسب برای: کاربرِ تک‌دستگاه</div>
+          </div>
+        </div>
+      </div>
+      <div class="flip-card reveal" style="--d:.12s" tabindex="0" role="button" aria-label="کارت مقایسه IMAP — برای چرخش کلیک کنید">
+        <div class="flip-inner">
+          <div class="face front imap">
+            <div class="fc-ico">☁️</div>
+            <h3><span class="en">IMAP</span></h3>
+            <div class="fc-sub">Internet Message Access Protocol</div>
+            <p class="fc-tag">«همیشه همگام، همه‌جا!»</p>
+            <span class="fc-hint">🔄 برای دیدنِ جزئیات کلیک کن</span>
+          </div>
+          <div class="face back b-imap">
+            <h4>☁️ IMAP چطور کار می‌کند؟</h4>
+            <ul>
+              <li>ایمیل‌ها <b>روی سرور</b> باقی می‌مانند</li>
+              <li>بین گوشی، لپ‌تاپ، تبلت و وب <b>همگام</b> می‌شوند</li>
+              <li>پوشه‌ها و برچسب‌ها روی سرور ساخته می‌شوند</li>
+              <li>خواندن یا حذفِ یک ایمیل، همه‌جا دیده می‌شود</li>
+            </ul>
+            <div class="fc-tip">💡 مثل خواندنِ نامه‌ها در اپلیکیشنِ پست؛ نامه‌ها همان‌جا می‌مانند و از هر دستگاهی همان یک نسخه را می‌بینی!</div>
+            <div class="ports-row">
+              <div class="port-chip"><span class="pn">143</span><span class="pl">بدون رمزنگاری</span></div>
+              <div class="port-chip"><span class="pn">993</span><span class="pl">SSL/TLS — امن ✅</span></div>
+            </div>
+            <div class="fit">📱💻 مناسب برای: کاربرِ چنددستگاه</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tbl-wrap reveal">
+      <table>
+        <thead><tr><th>ویژگی</th><th>📥 POP3</th><th>☁️ IMAP</th></tr></thead>
+        <tbody>
+          <tr><td>ذخیره‌سازی روی سرور <span class="en">(Server Storage)</span></td><td>معمولاً حذف می‌شود ❌</td><td>باقی می‌ماند ✅</td></tr>
+          <tr><td>همگام‌سازی چنددستگاهی <span class="en">(Multi-device Sync)</span></td><td>ندارد ❌</td><td>دارد ✅</td></tr>
+          <tr><td>پوشه‌ها و برچسب‌ها <span class="en">(Folders &amp; Labels)</span></td><td>ندارد ❌</td><td>دارد ✅</td></tr>
+          <tr><td>مصرفِ فضای سرور</td><td>کم ✅</td><td>زیاد ⚠️</td></tr>
+          <tr><td>مناسب برای</td><td>کاربرِ تک‌دستگاه 👤</td><td>کاربرِ چنددستگاه 📱💻</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note-line reveal">💡 <b>وبمیل (Webmail)</b> مثل Gmail و Yahoo Mail در پشتِ صحنه همین پروتکل‌ها را از طریقِ مرورگر و HTTPS برایت اجرا می‌کند؛ برای همگام‌سازیِ موبایل هم پروتکلِ Exchange ActiveSync (EAS) وجود دارد.</div>
+  </div>
+</section>
+
+<section id="anatomy" class="tint-cyan">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🔬</div>
+      <h2>کالبدشکافیِ یک ایمیل <span class="en">(Email Anatomy)</span></h2>
+      <p class="sec-sub">روی بخش‌های شماره‌دارِ این ایمیلِ نمونه کلیک کن تا برجسته شوند و توضیحشان را ببینی!</p>
+    </div>
+    <div class="anat-grid">
+      <div class="email-window reveal">
+        <div class="ew-bar">
+          <div class="dots"><i></i><i></i><i></i></div>
+          <span class="ew-title">📥 صندوقِ ورودی <span class="en">(Inbox)</span> — یک ایمیلِ نمونه</span>
+          <span class="ew-hint" id="ewHint">👆 روی بخش‌ها کلیک کن!</span>
+        </div>
+        <div class="ew-body">
+          <div class="email-part" data-part="header" tabindex="0" role="button" aria-label="بخش سرآیند">
+            <span class="pnum">۱</span>
+            <div class="ep-row"><span class="k">از (From):</span><span>👩‍🏫 سارا محمدی</span><span class="addr">s.mohammadi@school.ir</span></div>
+            <div class="ep-row"><span class="k">به (To):</span><span>👦 دانش‌آموزِ عزیز</span><span class="addr">student@example.com</span></div>
+            <div class="ep-row"><span class="k">موضوع (Subject):</span><span>📚 برنامهٔ مطالعهٔ این هفته</span></div>
+          </div>
+          <div class="email-part" data-part="body" tabindex="0" role="button" aria-label="بخش بدنه">
+            <span class="pnum">۲</span>
+            <p>سلام دانش‌آموزِ عزیز! 👋</p>
+            <p>برنامهٔ مطالعهٔ این هفته را برایت ضمیمه کرده‌ام؛ لطفاً هر روز ۳۰ دقیقه به درسِ علوم اختصاص بده. اگر سؤالی داشتی، ایمیل بزن!</p>
+            <p>موفق باشی! 🌟</p>
+          </div>
+          <div class="email-part" data-part="attachment" tabindex="0" role="button" aria-label="بخش ضمیمه">
+            <span class="pnum">۳</span>
+            <span class="attach">📎 <bdi>برنامه-مطالعه.pdf</bdi> <small>— ۲ مگابایت</small></span>
+          </div>
+          <div class="email-part" data-part="signature" tabindex="0" role="button" aria-label="بخش امضا">
+            <span class="pnum">۴</span>
+            <div class="sig">
+              <div>با احترام،</div>
+              <div><b>سارا محمدی</b> — معلمِ علوم</div>
+              <div><span class="addr" style="display:inline-block">s.mohammadi@school.ir</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside class="info-panel reveal" style="--d:.15s" id="anatPanel">
+        <div class="ip-default" id="ipDefault"><span class="big">👆</span>روی یکی از ۴ بخشِ شماره‌دارِ ایمیل کلیک کن تا توضیحش را اینجا ببینی!</div>
+        <div id="ipContent" hidden>
+          <h4 class="ip-title" id="ipTitle"></h4>
+          <p class="ip-desc" id="ipDesc"></p>
+          <div class="ip-chips" id="ipChips"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+<section id="life">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🎯</div>
+      <h2>ایمیل در زندگیِ ما</h2>
+      <p class="sec-sub">کجا به کار می‌آید و چه خوبی‌ها و بدی‌هایی دارد؟</p>
+    </div>
+    <div class="life-grid">
+      <div class="life-card c-uses reveal">
+        <h3>🎯 کاربردها <span class="en">(Uses)</span></h3>
+        <ul>
+          <li><span class="ic">👥</span>ارتباط شخصی با دوستان و خانواده</li>
+          <li><span class="ic">💼</span>مکاتبات رسمی و کاری</li>
+          <li><span class="ic">🎓</span>آموزش: تکالیف و اطلاع‌رسانیِ مدرسه</li>
+          <li><span class="ic">📰</span>خبرنامه <span class="en">(Newsletter)</span> و بازاریابی</li>
+          <li><span class="ic">🎧</span>خدماتِ مشتری و پشتیبانی</li>
+        </ul>
+      </div>
+      <div class="life-card c-pros reveal" style="--d:.1s">
+        <h3>✅ مزایا <span class="en">(Advantages)</span></h3>
+        <ul>
+          <li><span class="ic">⚡</span>سرعت: ارسال در چند ثانیه</li>
+          <li><span class="ic">💸</span>هزینهٔ تقریباً صفر</li>
+          <li><span class="ic">👥</span>ارسالِ گروهی با To / Cc / Bcc</li>
+          <li><span class="ic">🔍</span>آرشیو و جستجوی آسان</li>
+          <li><span class="ic">📎</span>ارسال فایل و سند (ضمیمه)</li>
+        </ul>
+      </div>
+      <div class="life-card c-cons reveal" style="--d:.2s">
+        <h3>⚠️ معایب <span class="en">(Disadvantages)</span></h3>
+        <ul>
+          <li><span class="ic">🚫</span>اسپم <span class="en">(Spam)</span>: ایمیل‌های مزاحم و تبلیغاتی</li>
+          <li><span class="ic">🎣</span>فیشینگ <span class="en">(Phishing)</span> و بدافزار</li>
+          <li><span class="ic">📶</span>نیاز به اتصالِ اینترنت</li>
+          <li><span class="ic">📦</span>محدودیتِ حجمِ ضمیمه (حدود ۲۵ مگابایت در Gmail)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="security" class="tint-rose">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🛡️</div>
+      <h2>امنیتِ ایمیل <span class="en">(Email Security)</span></h2>
+      <p class="sec-sub">با این ۶ سپر، حسابِ ایمیلت را امن نگه دار!</p>
+    </div>
+    <div class="sec-grid">
+      <div class="sec-card reveal">
+        <div class="ic" style="background:#eef2ff">🔐</div>
+        <h3>رمزِ عبورِ قوی <span class="en">(Strong Password)</span></h3>
+        <p>حداقل ۱۲ کاراکتر: حروفِ بزرگ و کوچک، عدد و نماد. برای هر حساب یک رمزِ جداگانه انتخاب کن — و رمز را برای هیچ‌کس (حتی دوستت!) نفرست.</p>
+      </div>
+      <div class="sec-card reveal" style="--d:.08s">
+        <div class="ic" style="background:#ecfdf5">📲</div>
+        <h3>احرازِ هویتِ دو عاملی <span class="en">(2FA)</span></h3>
+        <p>با یک کدِ دوم (پیامک یا اپلیکیشن) قفلِ دوبل می‌گذاری؛ حتی اگر رمز لو برود، سارق واردِ حساب نمی‌شود.</p>
+      </div>
+      <div class="sec-card reveal" style="--d:.16s">
+        <div class="ic" style="background:#cffafe">🔒</div>
+        <h3>رمزنگاری SSL/TLS <span class="en">(Encryption)</span></h3>
+        <p>مسیرِ ایمیل را رمز می‌کند تا در راه، کسی آن را نخواند؛ پورت‌های امن: <span class="en">465 · 587 · 993 · 995</span>.</p>
+      </div>
+      <div class="sec-card reveal">
+        <div class="ic" style="background:#fef3c7">🛡️</div>
+        <h3>سه نگهبان: <span class="en">SPF / DKIM / DMARC</span></h3>
+        <p>سه فیلترِ هوشمند روی سرور که بررسی می‌کنند ایمیل واقعاً از همان فرستنده‌ای آمده که ادعا می‌کند — پس جعل (Spoofing) لو می‌رود.</p>
+      </div>
+      <div class="sec-card reveal" style="--d:.08s">
+        <div class="ic" style="background:#fff1f2">🎣</div>
+        <h3>مراقبِ فیشینگ باش <span class="en">(Phishing)</span></h3>
+        <p>نشانه‌ها: آدرسِ عجیب مثلِ <span class="en">gma1l.com</span> به‌جای <span class="en">gmail.com</span>، ترساندن و عجله، درخواستِ رمز یا اطلاعاتِ بانکی و لینک‌های ناشناس.</p>
+      </div>
+      <div class="sec-card reveal" style="--d:.16s">
+        <div class="ic" style="background:#f5f3ff">📎</div>
+        <h3>با ضمیمه‌ها احتیاط کن <span class="en">(Attachments)</span></h3>
+        <p>فایل‌های <span class="en">.exe</span> و عجیب را باز نکن؛ از فرستندهٔ ناشناس چیزی دانلود نکن و قبل از باز کردن، با آنتی‌ویروس اسکن کن.</p>
+      </div>
+    </div>
+    <div class="sec-note reveal">🧠 <b>قانونِ طلایی:</b> اگر ایمیلی با عجله می‌خواهد رمز یا اطلاعاتِ حساسِ تو را بگیرد، تقریباً همیشه فیشینگ است — اول فکر کن، بعد کلیک کن!</div>
+  </div>
+</section>
+
+<section id="quiz">
+  <div class="container">
+    <div class="sec-head reveal">
+      <div class="sec-ico">🧠</div>
+      <h2>آزمونِ آخرِ درس <span class="en">(Mini Quiz)</span></h2>
+      <p class="sec-sub">۶ سؤالِ کوتاه — جواب بده و بلافاصله نتیجه و توضیح را ببین!</p>
+    </div>
+    <div class="quiz-card reveal" id="quizBox"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-ico">📧</div>
+  <p class="foot-thanks">به پایانِ سفرِ ایمیل رسیدی — حالا می‌دانی یک ایمیل چطور راه می‌افتد، چه اجزایی دارد و چطور از حسابت محافظت کنی. 🌟</p>
+  <div class="credit">این ارائه توسط محمد سلیمانی از مدرسه بحر العلوم تهیه شده.</div>
+</footer>
+<script>
+(function(){
+'use strict';
+function $(s,c){return (c||document).querySelector(s);}
+function $$(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s));}
+function fa(n){return n.toLocaleString('fa-IR',{maximumFractionDigits:0});}
+
+/* ---------- ظاهر شدن هنگام اسکرول ---------- */
+var revealIO=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+    if(e.isIntersecting){ e.target.classList.add('visible'); revealIO.unobserve(e.target); }
+  });
+},{threshold:.12});
+$$('.reveal, .reveal-fade').forEach(function(el){ revealIO.observe(el); });
+
+/* ---------- شمارنده‌های متحرک آمار ---------- */
+function runCount(el){
+  var target=parseFloat(el.getAttribute('data-target')), dur=1800, t0=performance.now();
+  var dec=(target%1!==0)?1:0;
+  function frame(t){
+    var p=Math.min(1,(t-t0)/dur), eased=1-Math.pow(1-p,3), v=target*eased;
+    el.textContent=v.toLocaleString('fa-IR',{minimumFractionDigits:dec,maximumFractionDigits:dec});
+    if(p<1){ requestAnimationFrame(frame); }
+  }
+  requestAnimationFrame(frame);
+}
+var cIO=new IntersectionObserver(function(es){
+  es.forEach(function(e){ if(e.isIntersecting){ runCount(e.target); cIO.unobserve(e.target); } });
+},{threshold:.4});
+$$('.count').forEach(function(el){ cIO.observe(el); });
+
+/* ---------- سفرِ ایمیل ---------- */
+var track=$('#jTrack'), line=$('#trackLine'), fill=$('#trackFill'), env=$('#envBadge');
+var stations=$$('.station'), STEPS=stations.length;
+var mqMobile=window.matchMedia('(max-width:760px)');
+var stepData=[
+ {ico:'✍️',t:'نوشتنِ ایمیل',
+  d:'فرستنده پیام را در یک <b>کلاینتِ ایمیل (Email Client)</b> مثل Outlook و Thunderbird یا در <b>وبمیل (Webmail)</b> مثل Gmail می‌نویسد: آدرسِ گیرنده (To)، موضوع (Subject)، متن و ضمیمه‌ها را آماده می‌کند و روی «ارسال» کلیک می‌کند.',
+  tip:'💡 مثلِ نوشتنِ یک نامه و انداختنِ آن در صندوقِ پستِ محلّه.'},
+ {ico:'📤',t:'تحویل به سرورِ SMTP فرستنده',
+  d:'کلاینت، ایمیل را با پروتکلِ <b>SMTP</b> به سرورِ خروجیِ فرستنده می‌سپارد. SMTP فقط مخصوصِ «ارسال» است — پستچیِ دنیای ایمیل! پورت‌های رایج: <span class="en">25, 465, 587</span>.',
+  tip:'💡 مثلِ این که کارمندِ ادارهٔ پست، نامه را از صندوق بردارد.'},
+ {ico:'🔍',t:'پرس‌وجو از DNS — رکوردِ MX',
+  d:'سرورِ فرستنده باید بفهمد «ادارهٔ پستِ» گیرنده کجاست؛ از سیستمِ <b>DNS</b> می‌پرسد. <b>رکوردِ MX (Mail Exchange)</b> می‌گوید سرورِ ایمیلِ گیرنده کدام است.',
+  tip:'💡 مثلِ گشودنِ دفترچهٔ تلفن برای پیدا کردنِ آدرسِ ادارهٔ پستِ شهرِ مقصد.'},
+ {ico:'📨',t:'انتقال بین دو سرور',
+  d:'سرورِ SMTP فرستنده، ایمیل را از طریقِ اینترنت برای سرورِ SMTP گیرنده می‌فرستد. در این مسیر، رمزنگاریِ <b>TLS</b> مثل یک قفل، محتوای نامه را محافظت می‌کند.',
+  tip:'💡 مثلِ ماشینِ پست که نامه را بین دو شهر جابه‌جا می‌کند.'},
+ {ico:'📥',t:'رسیدن به صندوقِ پستی (Mailbox)',
+  d:'سرورِ گیرنده ایمیل را بررسی می‌کند و در <b>صندوقِ پستی (Mailbox)</b> او ذخیره می‌کند؛ ایمیل حالا منتظر است تا گیرنده آن را بخواند.',
+  tip:'💡 مثلِ این که نامه در صندوقِ پستیِ خانهٔ گیرنده بنشیند.'},
+ {ico:'👀',t:'دریافت و خواندن با POP3 یا IMAP',
+  d:'گیرنده با کلاینت یا وبمیل، ایمیل را دریافت می‌کند: با <b>POP3</b> ایمیل دانلود و معمولاً از سرور حذف می‌شود؛ با <b>IMAP</b> ایمیل روی سرور می‌ماند و بین دستگاه‌ها همگام است.',
+  tip:'💡 مثلِ برداشتنِ نامه از صندوق — یا خواندنش همان‌جا در اپلیکیشنِ پست!'}
+];
+var cur=0, playing=false, timer=null;
+
+function renderDetail(){
+  var s=stepData[cur];
+  $('#jdIco').textContent=s.ico;
+  $('#jdTitle').textContent=s.t;
+  $('#jdDesc').innerHTML=s.d;
+  $('#jdTip').textContent=s.tip;
+  var p=$('#jdPanel');
+  p.classList.remove('swap'); void p.offsetWidth; p.classList.add('swap');
+  $('#jdStepTxt').textContent=fa(cur+1)+' از '+fa(STEPS);
+}
+function layoutTrack(){
+  var tr=track.getBoundingClientRect();
+  if(mqMobile.matches){
+    var r1=stations[0].querySelector('.st-circle').getBoundingClientRect();
+    var r2=stations[STEPS-1].querySelector('.st-circle').getBoundingClientRect();
+    var y1=r1.top-tr.top+r1.height/2, y2=r2.top-tr.top+r2.height/2;
+    var cx=tr.right-r1.left-r1.width/2;
+    line.style.top=(y1-2.5)+'px';
+    line.style.height=(y2-y1)+'px';
+    line.style.right=(cx-2.5)+'px';
+    line.style.left='auto';
+  }else{
+    line.style.top='';line.style.height='';line.style.right='';line.style.left='';
+  }
+}
+function updateFill(){
+  var pct=cur/(STEPS-1)*100;
+  if(mqMobile.matches){ fill.style.width='100%'; fill.style.height=pct+'%'; }
+  else{ fill.style.width=pct+'%'; fill.style.height='100%'; }
+}
+function positionEnv(){
+  var tr=track.getBoundingClientRect();
+  var c=stations[cur].querySelector('.st-circle').getBoundingClientRect();
+  var x=c.left-tr.left+c.width/2-env.offsetWidth/2;
+  var y=c.top-tr.top+c.height/2-env.offsetHeight/2;
+  env.style.transform='translate('+x+'px,'+y+'px)';
+}
+function goTo(i){
+  cur=Math.max(0,Math.min(STEPS-1,i));
+  stations.forEach(function(s,idx){ s.classList.toggle('active',idx===cur); });
+  renderDetail(); updateFill(); positionEnv();
+}
+function stopPlay(){
+  playing=false; clearInterval(timer);
+  $('#btnPlay').textContent=(cur>=STEPS-1)?'🔁 شروعِ دوباره':'▶ شروعِ سفر';
+}
+function startPlay(){
+  stopPlay();
+  playing=true;
+  if(cur>=STEPS-1){ goTo(0); }
+  $('#btnPlay').textContent='⏸ توقف';
+  timer=setInterval(function(){ if(cur<STEPS-1){ goTo(cur+1); } else { stopPlay(); } },3000);
+}
+stations.forEach(function(s,i){
+  s.addEventListener('click',function(){ stopPlay(); goTo(i); });
+  s.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); stopPlay(); goTo(i); } });
+});
+$('#btnPlay').addEventListener('click',function(){ if(playing){ stopPlay(); } else { startPlay(); } });
+$('#btnPrev').addEventListener('click',function(){ stopPlay(); goTo(cur-1); });
+$('#btnNext').addEventListener('click',function(){ stopPlay(); goTo(cur+1); });
+window.addEventListener('resize',function(){ layoutTrack(); updateFill(); positionEnv(); });
+window.addEventListener('load',function(){ layoutTrack(); updateFill(); positionEnv(); });
+goTo(0);
+
+/* ---------- کارت‌های چرخان POP3 و IMAP ---------- */
+$$('.flip-card').forEach(function(c){
+  c.addEventListener('click',function(){ c.classList.toggle('flipped'); });
+  c.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); c.classList.toggle('flipped'); } });
+});
+
+/* ---------- اجزای پیام (کالبدشکافی) ---------- */
+var partData={
+ header:{ico:'🏷️',t:'سرآیند (Header)',
+  d:'شناسنامهٔ ایمیل! فرستنده، گیرنده، موضوع، تاریخ و حتی مسیرِ رفت‌وآمدِ پیام را نگه می‌دارد — مثل پاکتِ نامهٔ پستی که آدرس‌ها رویش نوشته شده است.',
+  chips:['From = فرستنده','To = گیرنده','Cc = کپی (همه می‌بینند)','Bcc = کپیِ مخفی','Subject = موضوع','Date = تاریخ']},
+ body:{ico:'📝',t:'بدنه (Body)',
+  d:'متنِ اصلیِ پیام که فرستنده نوشته است؛ می‌تواند متنِ ساده (Plain Text) یا HTMLِ زیبا با رنگ، لینک و تصویر باشد — همان چیزی که الان می‌خوانی!',
+  chips:['Plain Text = متنِ ساده','HTML = متنِ قالب‌بندی‌شده']},
+ attachment:{ico:'📎',t:'ضمیمه (Attachment)',
+  d:'فایل‌هایی که سوارِ ایمیل می‌شوند: تکلیف، عکس، PDF و ... . فایل‌ها با استانداردِ MIME کدگذاری می‌شوند تا سالم به دستِ گیرنده برسند.',
+  chips:['MIME = استانداردِ کدگذاریِ ضمیمه','PDF، عکس، ویدئو و ...']},
+ signature:{ico:'✒️',t:'امضا (Signature)',
+  d:'پایان‌بندیِ ثابتِ فرستنده: نام، شغل و راه‌های تماس — مثل کارتِ ویزیتِ چسبیده به پایینِ هر نامه!',
+  chips:['نام و شغل','راه‌های تماس']}
+};
+var parts=$$('.email-part');
+function selectPart(key){
+  parts.forEach(function(p){ p.classList.toggle('active',p.getAttribute('data-part')===key); });
+  var d=partData[key];
+  $('#ipDefault').hidden=true;
+  $('#ipContent').hidden=false;
+  $('#ipTitle').innerHTML=d.ico+' '+d.t;
+  $('#ipDesc').innerHTML=d.d;
+  var chips=$('#ipChips'); chips.innerHTML='';
+  d.chips.forEach(function(ch){
+    var sp=document.createElement('span'); sp.className='ip-chip'; sp.innerHTML=ch; chips.appendChild(sp);
+  });
+  var hint=$('#ewHint'); if(hint){ hint.style.display='none'; }
+  var ip=$('#anatPanel');
+  ip.classList.remove('swap'); void ip.offsetWidth; ip.classList.add('swap');
+  if(window.innerWidth<900){ ip.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+}
+parts.forEach(function(p){
+  p.addEventListener('click',function(){ selectPart(p.getAttribute('data-part')); });
+  p.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); selectPart(p.getAttribute('data-part')); } });
+});
+
+/* ---------- آزمون ---------- */
+var quiz=[
+ {q:'کدام پروتکل برای «ارسالِ» ایمیل به کار می‌رود؟',
+  opts:['SMTP','POP3','IMAP','DNS'],a:0,
+  why:'SMTP پروتکلِ ارسال (Sending) است؛ دریافتِ ایمیل با POP3 یا IMAP انجام می‌شود.'},
+ {q:'می‌خواهی ایمیل‌ها روی گوشی، لپ‌تاپ و وب همیشه همگام باشند. کدام پروتکل را انتخاب می‌کنی؟',
+  opts:['POP3','IMAP','SMTP','HTTP'],a:1,
+  why:'IMAP ایمیل‌ها را روی سرور نگه می‌دارد و بینِ همهٔ دستگاه‌ها همگام می‌کند؛ POP3 بعد از دانلود معمولاً ایمیل را از سرور حذف می‌کند.'},
+ {q:'سرورِ فرستنده برای پیدا کردنِ سرورِ ایمیلِ گیرنده، در DNS به دنبالِ چه رکوردی می‌گردد؟',
+  opts:['رکورد A','رکورد MX','رکورد To','رکورد Send'],a:1,
+  why:'رکوردِ MX (Mail Exchange) مشخص می‌کند سرورِ پستِ الکترونیکیِ هر دامنه کدام است.'},
+ {q:'فرستنده، گیرنده و موضوعِ یک ایمیل در کدام بخش ذخیره می‌شوند؟',
+  opts:['بدنه (Body)','ضمیمه (Attachment)','سرآیند (Header)','امضا (Signature)'],a:2,
+  why:'سرآیند (Header) شناسنامهٔ ایمیل است: From، To، Subject، Date و مسیرِ آن را نگه می‌دارد.'},
+ {q:'کدام پورت، پورتِ امنِ (SSL/TLS) پروتکلِ IMAP است؟',
+  opts:['25','143','993','995'],a:2,
+  why:'IMAP روی پورتِ 143 (بدون رمزنگاری) و 993 (با SSL/TLS) کار می‌کند؛ پورتِ 995 مربوط به POP3 است!'},
+ {q:'کدام مورد نشانهٔ یک ایمیلِ فیشینگ (Phishing) است؟',
+  opts:['موضوعِ واضح و رسمی','درخواستِ فوری برای وارد کردنِ رمزِ عبور','ارسال از طرفِ معلمِ مدرسه','وجودِ امضای حرفه‌ای'],a:1,
+  why:'فیشرها با ترساندن و عجله سعی می‌کنند رمز و اطلاعاتِ حساس را بگیرند؛ همیشه آدرسِ فرستنده و لینک‌ها را با دقت بررسی کن.'}
+];
+var qi=0, score=0;
+var box=$('#quizBox');
+
+function renderQ(){
+  var item=quiz[qi];
+  var html=''
+   +'<div class="q-progress"><div class="q-bar" style="width:'+((qi+1)/quiz.length*100)+'%"></div></div>'
+   +'<div class="q-meta"><span>سؤالِ '+fa(qi+1)+' از '+fa(quiz.length)+'</span><span>⭐ امتیاز: '+fa(score)+'</span></div>'
+   +'<div class="q-text">'+item.q+'</div>'
+   +'<div class="q-opts">';
+  item.opts.forEach(function(o,i){ html+='<button class="q-opt" data-i="'+i+'">'+o+'</button>'; });
+  html+='</div><div class="q-feedback" id="qFb"></div>'
+   +'<button class="btn btn-grad btn-sm q-next" id="qNext">'+(qi===quiz.length-1?'دیدنِ نتیجه 🏁':'سؤالِ بعدی ←')+'</button>';
+  box.innerHTML=html;
+  $$('.q-opt',box).forEach(function(b){
+    b.addEventListener('click',function(){ answer(parseInt(b.getAttribute('data-i'),10)); });
+  });
+}
+function answer(i){
+  var item=quiz[qi];
+  var opts=$$('.q-opt',box);
+  opts.forEach(function(b){
+    b.disabled=true;
+    if(parseInt(b.getAttribute('data-i'),10)===item.a){ b.classList.add('correct'); }
+  });
+  var fb=$('#qFb'), next=$('#qNext');
+  if(i===item.a){
+    score++;
+    fb.className='q-feedback ok';
+    fb.innerHTML='✅ <b>آفرین، درست گفتی!</b> '+item.why;
+  }else{
+    opts.forEach(function(b){ if(parseInt(b.getAttribute('data-i'),10)===i){ b.classList.add('wrong'); } });
+    fb.className='q-feedback no';
+    fb.innerHTML='❌ <b>اشتباه بود!</b> جوابِ درست: <b>'+item.opts[item.a]+'</b> — '+item.why;
+  }
+  var metas=box.querySelectorAll('.q-meta span');
+  metas[1].textContent='⭐ امتیاز: '+fa(score);
+  next.style.display='inline-flex';
+  next.addEventListener('click',function(){ qi++; if(qi<quiz.length){ renderQ(); } else { renderResult(); } });
+}
+function confetti(){
+  var c=document.createElement('div'); c.className='confetti'; document.body.appendChild(c);
+  var colors=['#6366f1','#06b6d4','#f59e0b','#10b981','#ec4899','#f87171'];
+  for(var i=0;i<28;i++){
+    var sp=document.createElement('i');
+    sp.style.left=(Math.random()*100)+'vw';
+    sp.style.background=colors[i%colors.length];
+    sp.style.animationDuration=(2.2+Math.random()*1.3)+'s';
+    sp.style.animationDelay=(Math.random()*0.5)+'s';
+    c.appendChild(sp);
+  }
+  setTimeout(function(){ c.remove(); },4200);
+}
+function renderResult(){
+  var pct=Math.round(score/quiz.length*100), msg, emo, col;
+  if(score===quiz.length){ emo='🏆'; msg='واقعاً فوق‌العاده بود! تو یک متخصصِ ایمیل هستی!'; }
+  else if(score>=4){ emo='🎉'; msg='خیلی خوب بود! فقط چند نکتهٔ کوچک را دوباره مرور کن.'; }
+  else if(score>=2){ emo='📖'; msg='بد نبود! یک بارِ دیگر درس را مرور کن و دوباره امتحان بده.'; }
+  else{ emo='🌱'; msg='اشکالی ندارد! با خواندنِ دوبارهٔ صفحه حتماً بهتر می‌شوی.'; }
+  col=(pct>=50)?'#10b981':(pct>=33?'#f59e0b':'#f87171');
+  box.innerHTML='<div class="q-result">'
+   +'<div class="score-ring" id="ring"><div class="in">'+emo+'</div></div>'
+   +'<h3>'+fa(score)+' از '+fa(quiz.length)+' درست!</h3>'
+   +'<p class="q-msg">'+msg+'</p>'
+   +'<button class="btn btn-grad" id="qRestart">🔄 آزمونِ دوباره</button> '
+   +'<a class="btn btn-light" href="#journey">📖 مرورِ درس</a>'
+   +'</div>';
+  $('#ring').style.background='conic-gradient('+col+' '+pct+'%, #eef2f7 0)';
+  $('#qRestart').addEventListener('click',function(){ qi=0; score=0; renderQ(); });
+  if(score>=5){ confetti(); }
+}
+renderQ();
+})();
+</script>
+</body>
+</html>
